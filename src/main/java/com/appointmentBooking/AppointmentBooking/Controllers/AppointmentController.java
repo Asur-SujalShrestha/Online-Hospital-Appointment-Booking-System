@@ -29,6 +29,12 @@ public class AppointmentController {
         return ResponseEntity.ok(message);
     }
 
+    @GetMapping("/getAllAppointment")
+    public ResponseEntity<List<Appointments>> getAllAppointment() {
+        List<Appointments> appointmentsList = appointmentService.getAllAppointments();
+        return ResponseEntity.ok(appointmentsList);
+    }
+
     @GetMapping("/get-appointment-by-doctorId/{doctorId}")
     public ResponseEntity<List<Appointments>> getAppointmentsByDoctorId(@PathVariable Long doctorId) throws BadRequestException {
         List<Appointments> appointmentsList = appointmentService.getAppointmentByDoctorId(doctorId);

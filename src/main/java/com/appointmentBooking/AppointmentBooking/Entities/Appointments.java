@@ -1,9 +1,7 @@
 package com.appointmentBooking.AppointmentBooking.Entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.appointmentBooking.AppointmentBooking.DTOs.Prescriptions;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
@@ -11,6 +9,7 @@ import org.hibernate.validator.constraints.Length;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,6 +29,8 @@ public class Appointments {
     @Length(max = 100, message = "Notes must not exceed 100 characters")
     private String notes;
     private Status status;
+
+    transient private List<Prescriptions> prescriptions;
 
     public enum Status{
         PENDING, APPROVED, COMPLETED, CANCELLED

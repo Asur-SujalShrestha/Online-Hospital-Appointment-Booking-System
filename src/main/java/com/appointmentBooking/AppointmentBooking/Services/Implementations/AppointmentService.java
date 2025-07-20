@@ -8,20 +8,25 @@ import com.appointmentBooking.AppointmentBooking.Entities.Appointments;
 import com.appointmentBooking.AppointmentBooking.Repositories.AppointmentRepository;
 import com.appointmentBooking.AppointmentBooking.Services.DoctorClient;
 import com.appointmentBooking.AppointmentBooking.Services.IAppointmentService;
+import com.appointmentBooking.AppointmentBooking.Services.PrescriptionClient;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService implements IAppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorClient doctorClient;
+    private final PrescriptionClient prescriptionClient;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, DoctorClient doctorClient) {
+    public AppointmentService(AppointmentRepository appointmentRepository, DoctorClient doctorClient, PrescriptionClient prescriptionClient) {
         this.appointmentRepository = appointmentRepository;
         this.doctorClient = doctorClient;
+        this.prescriptionClient = prescriptionClient;
     }
 
     @Override
@@ -61,12 +66,25 @@ public class AppointmentService implements IAppointmentService {
     }
 
     @Override
+    public List<Appointments> getAllAppointments() {
+        List<Appointments> appointmentsList = appointmentRepository.findAll();
+        return appointmentsList.stream().map(appointment -> {
+            appointment.setPrescriptions(prescriptionClient.getPrescriptionByAppointment(appointment.getAppointmentId()));
+            return appointment;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public List<Appointments> getAppointmentByDoctorId(Long doctorId) throws BadRequestException {
         DoctorDTO doctorDTO = doctorClient.getDoctor(doctorId);
         if(doctorDTO == null) {
             throw new BadRequestException("Doctor not found");
         }
-        return appointmentRepository.findByDoctorId(doctorId);
+        List<Appointments> appointmentsList =  appointmentRepository.findByDoctorId(doctorId);
+        return appointmentsList.stream().map(appointments -> {
+            appointments.setPrescriptions(prescriptionClient.getPrescriptionByAppointment(appointments.getAppointmentId()));
+            return appointments;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -74,7 +92,11 @@ public class AppointmentService implements IAppointmentService {
         if(!doctorClient.isPatientExist(patientId)){
             throw new BadRequestException("Patient not found");
         }
-        return appointmentRepository.findByPatientId(patientId);
+        List<Appointments> appointmentsList = appointmentRepository.findByPatientId(patientId);
+        return appointmentsList.stream().map(appointments -> {
+            appointments.setPrescriptions(prescriptionClient.getPrescriptionByAppointment(appointments.getAppointmentId()));
+            return appointments;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -106,4 +128,6 @@ public class AppointmentService implements IAppointmentService {
         appointmentRepository.save(appointment);
         return "Appointment Updated Successfully";
     }
+
+
 }

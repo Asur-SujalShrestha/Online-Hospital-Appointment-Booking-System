@@ -22,4 +22,6 @@ public interface IAppointmentService {
     String deleteAppointment(Long appointmentId) throws BadRequestException;
 
     String updateAppointmentStatus(Long appointmentId, String status) throws BadRequestException;
+
+    List<Appointments> getAllAppointments();
 }
