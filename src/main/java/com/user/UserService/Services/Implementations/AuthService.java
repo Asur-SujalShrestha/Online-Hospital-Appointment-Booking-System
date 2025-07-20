@@ -37,8 +37,9 @@ public class AuthService implements IAuthService{
     private final DoctorRepository doctorRepository;
     private final DoctorScheduleRepository doctorScheduleRepository;
     private final PatientRepository patientRepository;
+    private final EmailService emailService;
 
-    public AuthService(AuthRepository authRepository, BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil, DoctorRepository doctorRepository, DoctorScheduleRepository doctorScheduleRepository, PatientRepository patientRepository) {
+    public AuthService(AuthRepository authRepository, BCryptPasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtil, DoctorRepository doctorRepository, DoctorScheduleRepository doctorScheduleRepository, PatientRepository patientRepository, EmailService emailService) {
         this.authRepository = authRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
@@ -46,6 +47,7 @@ public class AuthService implements IAuthService{
         this.doctorRepository = doctorRepository;
         this.doctorScheduleRepository = doctorScheduleRepository;
         this.patientRepository = patientRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -80,7 +82,7 @@ public class AuthService implements IAuthService{
                     .build();
 
             doctorRepository.save(doctors);
-
+            emailService.RegisterDoctor(userDto.getEmail());
 
         }
         else if(userDto.getRole().equalsIgnoreCase("PATIENTS")){

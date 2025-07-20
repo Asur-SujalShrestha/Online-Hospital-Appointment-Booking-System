@@ -12,6 +12,7 @@ import com.user.UserService.repositories.DoctorRepository;
 import com.user.UserService.repositories.DoctorScheduleRepository;
 import com.user.UserService.repositories.PatientRepository;
 import jakarta.ws.rs.BadRequestException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -96,5 +97,14 @@ public class UserService implements IUserService {
         doctor.setStatus(Enum.valueOf(Doctors.Status.class, status));
         doctorRepository.save(doctor);
         return "Doctor status updated successfully";
+    }
+
+    @Override
+    public Users getUserByEmail(String email) {
+        Users user = authRepository.findByEmail(email);
+        if(user == null){
+            throw new UsernameNotFoundException("User not found");
+        }
+        return user;
     }
 }

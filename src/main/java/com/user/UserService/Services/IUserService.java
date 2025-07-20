@@ -25,4 +25,6 @@ public interface IUserService {
     Patients getPatientById(long patientId);
 
     String updateDoctorStatus(long doctorId, String status);
+
+    Users getUserByEmail(String email);
 }

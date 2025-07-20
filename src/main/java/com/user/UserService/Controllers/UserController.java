@@ -47,6 +47,12 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/getUserByEmail/{email}")
+    public ResponseEntity<Users> getUserByEmail(@PathVariable String email) {
+        Users user = userService.getUserByEmail(email);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
     @PostMapping("/addSchedule")
     public ResponseEntity<String> addSchedule(@RequestBody DoctorScheduleDTO doctorScheduleDTO) {
         String result = userService.addSchedule(doctorScheduleDTO);
