@@ -84,4 +84,13 @@ public class PrescriptionService implements IPrescriptionService {
         }
         return prescriptionRepository.findByPatientId(patientId);
     }
+
+    @Override
+    public List<Prescriptions> getPrescriptionByAppointmentId(long appointmentId) {
+        boolean result = appointmentPrescriptionClient.appointmentExist(appointmentId);
+        if (!result) {
+            throw new NotFoundException("Appointment not found");
+        }
+        return prescriptionRepository.findByAppointmentId(appointmentId);
+    }
 }

@@ -43,6 +43,12 @@ public class PrescriptionController {
        return ResponseEntity.ok(prescriptions);
     }
 
+    @GetMapping("/getPrescriptionByAppointment/{appointmentId}")
+    public ResponseEntity<List<Prescriptions>> getPrescriptionByAppointment(@PathVariable long appointmentId) {
+        List<Prescriptions> prescriptionsList = prescriptionService.getPrescriptionByAppointmentId(appointmentId);
+        return ResponseEntity.ok(prescriptionsList);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
         return ResponseEntity.badRequest().body(e.getMessage());

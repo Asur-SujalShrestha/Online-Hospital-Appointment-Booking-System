@@ -14,4 +14,6 @@ public interface IPrescriptionService {
     List<Prescriptions> getPrescriptionByDoctorId(long doctorId);
 
     List<Prescriptions> getPrescriptionByPatientId(long patientId);
+
+    List<Prescriptions> getPrescriptionByAppointmentId(long appointmentId);
 }
