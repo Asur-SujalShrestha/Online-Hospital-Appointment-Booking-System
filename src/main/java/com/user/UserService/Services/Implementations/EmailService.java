@@ -21,7 +21,7 @@ public class EmailService {
     }
 
     public void RegisterDoctor(String email) throws BadRequestException {
-        Users user = authRepository.findByEmail(email);
+        Users user = authRepository.findByEmail(email).orElse(null);
         if (user == null) {
             throw new BadRequestException("Please use valid Email.");
         }

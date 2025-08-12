@@ -53,7 +53,7 @@ public class AuthService implements IAuthService{
     @Override
     @Transactional
     public RegisterResponseDTO registerUser(UserDTO userDto) throws BadRequestException {
-       Users user = authRepository.findByEmail(userDto.getEmail());
+       Users user = authRepository.findByEmail(userDto.getEmail()).orElse(null);
         if (user != null) {
             throw new BadRequestException("User already exist");
         }
@@ -104,7 +104,7 @@ public class AuthService implements IAuthService{
 
     @Override
     public ResponseDTO loginUser(LoginDTO loginDTO) throws BadRequestException {
-        Users user = authRepository.findByEmail(loginDTO.getEmail());
+        Users user = authRepository.findByEmail(loginDTO.getEmail()).orElse(null);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }

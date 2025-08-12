@@ -101,7 +101,7 @@ public class UserService implements IUserService {
 
     @Override
     public Users getUserByEmail(String email) {
-        Users user = authRepository.findByEmail(email);
+        Users user = authRepository.findByEmail(email).orElse(null);
         if(user == null){
             throw new UsernameNotFoundException("User not found");
         }
