@@ -45,6 +45,28 @@ public class EmailService {
         sendSimpleMessage(mailBody);
     }
 
+    public void forgetPasswordMail(String email, int otp) throws MessagingException {
+        String htmlContent = "<div style='font-family: Arial, sans-serif; padding: 20px;'>"
+                + "<h2 style='color: #D35400;'>OTP Verification</h2>"
+                + "<p>Dear User,</p>"
+                + "<p>You have requested to reset your password. Please use the following OTP to proceed:</p>"
+                + "<div style='font-size: 24px; font-weight: bold; color: #2C3E50; margin: 20px 0;'>" + otp + "</div>"
+                + "<p>This OTP is valid for <strong>1 minute</strong>.</p>"
+                + "<p>If you did not make this request, please ignore this email.</p>"
+                + "<p>Best regards,<br/>NepoHeal Team</p>"
+                + "</div>";
+
+        // Create mail body
+        MailBody mailBody = MailBody.builder()
+                .to(email)
+                .subject("OTP for Forget Password Request")
+                .text(htmlContent)
+                .isHtml(true)
+                .build();
+
+        sendSimpleMessage(mailBody);
+    }
+
     public void sendSimpleMessage(MailBody mailBody) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

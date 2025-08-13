@@ -43,7 +43,7 @@ public class GoogleAuthController {
 
         GoogleIdToken.Payload payload = idToken.getPayload();
         String email = payload.getEmail();
-        String name = (String) payload.get("sub");
+        String name = (String) payload.get("name");
 
         Users user = authRepository.findByEmail(email).orElseGet(()->{
             Users newUser = new Users();

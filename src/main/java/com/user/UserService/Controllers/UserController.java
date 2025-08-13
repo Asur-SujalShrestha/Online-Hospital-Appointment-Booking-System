@@ -1,14 +1,19 @@
 package com.user.UserService.Controllers;
 
 import com.user.UserService.DTOs.DoctorScheduleDTO;
+import com.user.UserService.DTOs.OTPVerfiyDTO;
 import com.user.UserService.DTOs.UpdateScheduleDTO;
+import com.user.UserService.Services.Implementations.ForgetPasswordService;
 import com.user.UserService.Services.Implementations.UserService;
 import com.user.UserService.entities.DoctorSchedule;
 import com.user.UserService.entities.Doctors;
 import com.user.UserService.entities.Patients;
 import com.user.UserService.entities.Users;
+import jakarta.mail.MessagingException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,9 +23,11 @@ import java.util.List;
 @RequestMapping("/nepoHeal/user")
 public class UserController {
     private final UserService userService;
+    private final ForgetPasswordService forgetPasswordService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ForgetPasswordService forgetPasswordService) {
         this.userService = userService;
+        this.forgetPasswordService = forgetPasswordService;
     }
 
     @GetMapping("/allDoctors")
@@ -75,5 +82,27 @@ public class UserController {
     public ResponseEntity<String> updateDoctorStatus(@PathVariable long doctorId, @RequestParam String status) {
         String result = userService.updateDoctorStatus(doctorId, status);
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/forgetPassword")
+    public ResponseEntity<String> forgetPassword(@RequestParam("email") String email) throws BadRequestException, MessagingException {
+        String result = forgetPasswordService.addNewForgetPassword(email);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/verifyOtp")
+    public ResponseEntity<String> verifyOTP(@RequestBody OTPVerfiyDTO verfiyDTO) throws BadRequestException {
+        String result = forgetPasswordService.verifyOTP(verfiyDTO);
+        return ResponseEntity.ok(result);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleBadCredentialException(BadCredentialsException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
