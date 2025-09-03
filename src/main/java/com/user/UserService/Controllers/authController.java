@@ -7,6 +7,7 @@ import com.user.UserService.DTOs.UserDTO;
 import com.user.UserService.Services.Implementations.AuthService;
 import com.user.UserService.entities.Users;
 import org.apache.coyote.BadRequestException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +37,8 @@ public class authController {
 
 
     @ExceptionHandler(BadRequestException.class)
-    public String exceptionHandler(){
-        return "Password and Confirm password should match";
+    public ResponseEntity<String> exceptionHandler(BadRequestException ex){
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 

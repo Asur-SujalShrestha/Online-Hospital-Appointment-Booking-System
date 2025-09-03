@@ -1,5 +1,6 @@
 package com.user.UserService.Controllers;
 
+import com.user.UserService.DTOs.DoctorDTO;
 import com.user.UserService.DTOs.DoctorScheduleDTO;
 import com.user.UserService.DTOs.OTPVerfiyDTO;
 import com.user.UserService.DTOs.UpdateScheduleDTO;
@@ -37,9 +38,15 @@ public class UserController {
     }
 
     @GetMapping("/getDoctorById/{id}")
-    public ResponseEntity<Doctors> getDoctorById(@PathVariable long id) {
-        Doctors doctor = userService.getDoctorById(id);
+    public ResponseEntity<DoctorDTO> getDoctorById(@PathVariable long id) {
+        DoctorDTO doctor = userService.getDoctorById(id);
         return new ResponseEntity<>(doctor, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-doctorDetailById/{doctorId}")
+    public ResponseEntity<Users> getDoctorDetailById(@PathVariable long doctorId) {
+        Users user = userService.getDoctorDetail(doctorId);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @GetMapping("/getpatientById/{patientId}")

@@ -1,5 +1,6 @@
 package com.user.UserService.Services;
 
+import com.user.UserService.DTOs.DoctorDTO;
 import com.user.UserService.DTOs.DoctorScheduleDTO;
 import com.user.UserService.DTOs.UpdateScheduleDTO;
 import com.user.UserService.entities.DoctorSchedule;
@@ -12,7 +13,7 @@ import java.util.List;
 public interface IUserService {
     List<Users> getAllDoctors();
 
-    Doctors getDoctorById(long id);
+    DoctorDTO getDoctorById(long id);
 
     Boolean isPatientExist(long patientId);
 
@@ -27,4 +28,6 @@ public interface IUserService {
     String updateDoctorStatus(long doctorId, String status);
 
     Users getUserByEmail(String email);
+
+    Users getDoctorDetail(long DoctorId);
 }

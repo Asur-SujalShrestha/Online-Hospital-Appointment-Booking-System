@@ -1,5 +1,6 @@
 package com.user.UserService.Services.Implementations;
 
+import com.user.UserService.DTOs.DoctorDTO;
 import com.user.UserService.DTOs.DoctorScheduleDTO;
 import com.user.UserService.DTOs.UpdateScheduleDTO;
 import com.user.UserService.Services.IUserService;
@@ -37,8 +38,20 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Doctors getDoctorById(long id) {
-        return doctorRepository.findById(id).orElse(null);
+    public DoctorDTO getDoctorById(long id) {
+        Doctors doctors =  doctorRepository.findById(id).orElseThrow(()-> new BadRequestException("Doctor not found"));
+        if(doctors == null){
+            throw new BadRequestException("Doctor not found");
+        }
+        return DoctorDTO.builder()
+                .doctor_id(doctors.getDoctor_id())
+                .user(doctors.getUser().getUserId())
+                .specialization(doctors.getSpecialization())
+                .qualification(doctors.getQualification())
+                .status(String.valueOf(doctors.getStatus()))
+                .experience(doctors.getExperience())
+                .bio(doctors.getBio())
+                .build();
     }
 
     @Override
@@ -106,5 +119,11 @@ public class UserService implements IUserService {
             throw new UsernameNotFoundException("User not found");
         }
         return user;
+    }
+
+    @Override
+    public Users getDoctorDetail(long doctorId) {
+        Doctors doctors = doctorRepository.findById(doctorId).orElseThrow(()-> new BadRequestException("Doctor not found"));
+        return authRepository.findById(doctors.getUser().getUserId()).orElseThrow(()-> new BadRequestException("User not found"));
     }
 }
