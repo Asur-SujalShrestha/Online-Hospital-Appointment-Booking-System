@@ -1,9 +1,6 @@
 package com.appointmentBooking.AppointmentBooking.Services.Implementations;
 
-import com.appointmentBooking.AppointmentBooking.DTOs.AddAppointmentDTO;
-import com.appointmentBooking.AppointmentBooking.DTOs.AddedAppointmentResponse;
-import com.appointmentBooking.AppointmentBooking.DTOs.DoctorDTO;
-import com.appointmentBooking.AppointmentBooking.DTOs.UpdateAppointmentDTO;
+import com.appointmentBooking.AppointmentBooking.DTOs.*;
 import com.appointmentBooking.AppointmentBooking.Entities.Appointments;
 import com.appointmentBooking.AppointmentBooking.Repositories.AppointmentRepository;
 import com.appointmentBooking.AppointmentBooking.Services.DoctorClient;
@@ -22,16 +19,22 @@ public class AppointmentService implements IAppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final DoctorClient doctorClient;
     private final PrescriptionClient prescriptionClient;
+    private final EmailService emailService;
 
-    public AppointmentService(AppointmentRepository appointmentRepository, DoctorClient doctorClient, PrescriptionClient prescriptionClient) {
+    public AppointmentService(AppointmentRepository appointmentRepository, DoctorClient doctorClient, PrescriptionClient prescriptionClient, EmailService emailService) {
         this.appointmentRepository = appointmentRepository;
         this.doctorClient = doctorClient;
         this.prescriptionClient = prescriptionClient;
+        this.emailService = emailService;
     }
 
     @Override
     public AddedAppointmentResponse addAppointment(AddAppointmentDTO appointmentDto) throws BadRequestException {
         DoctorDTO doctorDTO = doctorClient.getDoctor(appointmentDto.getDoctorId());
+        UserDTO userDTO = doctorClient.getUserByEmail(appointmentDto.getPatientEmail());
+        if(userDTO == null) {
+            throw new BadRequestException("User not found");
+        }
         if(doctorDTO == null) {
             throw new BadRequestException("Doctor not found");
         }
@@ -55,6 +58,7 @@ public class AppointmentService implements IAppointmentService {
                 .build();
 
         appointmentRepository.save(newAppointment);
+        emailService.addAppointment(userDTO.getEmail(), newAppointment);
         return AddedAppointmentResponse.builder()
                 .doctorId(newAppointment.getDoctorId())
                 .patientId(newAppointment.getPatientId())

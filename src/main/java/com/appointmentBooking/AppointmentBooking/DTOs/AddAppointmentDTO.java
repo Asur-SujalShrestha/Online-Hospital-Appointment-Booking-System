@@ -18,6 +18,7 @@ import java.time.LocalTime;
 public class AddAppointmentDTO {
     private long doctorId;
     private long patientId;
+    private String patientEmail;
     private LocalDate appointmentDate;
     private LocalTime appointmentTime;
     private String notes;
