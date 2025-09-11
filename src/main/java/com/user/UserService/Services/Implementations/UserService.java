@@ -1,8 +1,6 @@
 package com.user.UserService.Services.Implementations;
 
-import com.user.UserService.DTOs.DoctorDTO;
-import com.user.UserService.DTOs.DoctorScheduleDTO;
-import com.user.UserService.DTOs.UpdateScheduleDTO;
+import com.user.UserService.DTOs.*;
 import com.user.UserService.Services.IUserService;
 import com.user.UserService.entities.DoctorSchedule;
 import com.user.UserService.entities.Doctors;
@@ -15,6 +13,7 @@ import com.user.UserService.repositories.PatientRepository;
 import jakarta.ws.rs.BadRequestException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -100,8 +99,15 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Patients getPatientById(long patientId) {
-        return patientRepository.findById(patientId).orElseThrow(()-> new BadRequestException("Patient not found"));
+    public PatientDTO getPatientById(long patientId) {
+        Patients patients =  patientRepository.findById(patientId).orElseThrow(()-> new BadRequestException("Patient not found"));
+        return PatientDTO.builder()
+                .patient_id(patients.getPatient_id())
+                .user(patients.getUser().getUserId())
+                .bloodGroup(patients.getBloodGroup())
+                .medicalNotes(patients.getMedicalNotes())
+                .allergies(patients.getAllergies())
+                .build();
     }
 
     @Override
@@ -125,5 +131,52 @@ public class UserService implements IUserService {
     public Users getDoctorDetail(long doctorId) {
         Doctors doctors = doctorRepository.findById(doctorId).orElseThrow(()-> new BadRequestException("Doctor not found"));
         return authRepository.findById(doctors.getUser().getUserId()).orElseThrow(()-> new BadRequestException("User not found"));
+    }
+
+    @Override
+    public Users getUser(long id) {
+        return authRepository.findById(id).orElseThrow(()->new RuntimeException("User not found"));
+    }
+
+    @Override
+    @Transactional
+    public String updateUserProfile(long id, UserDTO userDTO) {
+        Users user = authRepository.findById(id).orElseThrow(()-> new BadRequestException("User not found"));
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setEmail(userDTO.getEmail());
+        user.setPhone(userDTO.getPhone());
+        user.setGender(userDTO.getGender());
+        user.setDob(userDTO.getDob());
+
+        if(user.getRole().equals(Users.Roles.PATIENTS)){
+            Patients patient = patientRepository.findByUser(user);
+            if(patient == null){
+                throw new BadRequestException("Patient not found");
+            }
+            patient.setBloodGroup(userDTO.getBloodGroup());
+            patient.setMedicalNotes(userDTO.getMedicalNotes());
+            patient.setAllergies(userDTO.getAllergies());
+            patientRepository.save(patient);
+        }
+
+        else if(user.getRole().equals(Users.Roles.DOCTORS)){
+            Doctors doctors = doctorRepository.findByUser(user);
+            if(doctors == null){
+                throw new BadRequestException("Doctor not found");
+            }
+            doctors.setSpecialization(userDTO.getSpecialization());
+            doctors.setQualification(userDTO.getQualification());
+            doctors.setExperience(userDTO.getExperience());
+            doctors.setBio(userDTO.getBio());
+            doctorRepository.save(doctors);
+        }
+        authRepository.save(user);
+        return "User profile updated successfully";
+    }
+
+    @Override
+    public List<Users> getAllUser() {
+        return authRepository.findAll();
     }
 }

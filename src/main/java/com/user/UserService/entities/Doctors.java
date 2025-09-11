@@ -35,7 +35,7 @@ public class Doctors {
     private String bio;
 
     public enum Status {
-        APPROVE, PENDING, REJECTED
+        APPROVED, PENDING, REJECTED
     }
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference("doctor_schedule")

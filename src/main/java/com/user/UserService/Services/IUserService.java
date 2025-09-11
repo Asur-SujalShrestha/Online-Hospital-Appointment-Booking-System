@@ -1,8 +1,6 @@
 package com.user.UserService.Services;
 
-import com.user.UserService.DTOs.DoctorDTO;
-import com.user.UserService.DTOs.DoctorScheduleDTO;
-import com.user.UserService.DTOs.UpdateScheduleDTO;
+import com.user.UserService.DTOs.*;
 import com.user.UserService.entities.DoctorSchedule;
 import com.user.UserService.entities.Doctors;
 import com.user.UserService.entities.Patients;
@@ -23,11 +21,17 @@ public interface IUserService {
 
     String deleteSchedule(long scheduleId);
 
-    Patients getPatientById(long patientId);
+    PatientDTO getPatientById(long patientId);
 
     String updateDoctorStatus(long doctorId, String status);
 
     Users getUserByEmail(String email);
 
     Users getDoctorDetail(long DoctorId);
+
+    Users getUser(long id);
+
+    String updateUserProfile(long id, UserDTO userDTO);
+
+    List<Users> getAllUser();
 }

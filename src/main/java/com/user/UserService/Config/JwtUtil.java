@@ -29,14 +29,40 @@ public class JwtUtil implements Serializable {
     }
     // Generate JWT token
     public ResponseDTO generateToken(String username, Users user) {
-        String token = Jwts.builder()
-                .setSubject(username)
-                .claim("id", user.getUserId())
-                .claim("role", user.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+        String token = null;
+        if(user.getRole().equals(Users.Roles.PATIENTS)){
+            token = Jwts.builder()
+                    .setSubject(username)
+                    .claim("id", user.getUserId())
+                    .claim("role", user.getRole())
+                    .claim("patientId", user.getPatient().getPatient_id())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+        }
+        else if (user.getRole().equals(Users.Roles.DOCTORS)) {
+            token = Jwts.builder()
+                    .setSubject(username)
+                    .claim("id", user.getUserId())
+                    .claim("role", user.getRole())
+                    .claim("doctorId", user.getDoctor().getDoctor_id())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+        }
+        else{
+            token = Jwts.builder()
+                    .setSubject(username)
+                    .claim("id", user.getUserId())
+                    .claim("role", user.getRole())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                    .signWith(key, SignatureAlgorithm.HS256)
+                    .compact();
+        }
+
         return ResponseDTO.builder()
                 .token(token)
                 .userName(user.getFirstName())

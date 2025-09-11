@@ -1,9 +1,6 @@
 package com.user.UserService.Controllers;
 
-import com.user.UserService.DTOs.DoctorDTO;
-import com.user.UserService.DTOs.DoctorScheduleDTO;
-import com.user.UserService.DTOs.OTPVerfiyDTO;
-import com.user.UserService.DTOs.UpdateScheduleDTO;
+import com.user.UserService.DTOs.*;
 import com.user.UserService.Services.Implementations.ForgetPasswordService;
 import com.user.UserService.Services.Implementations.UserService;
 import com.user.UserService.entities.DoctorSchedule;
@@ -31,10 +28,30 @@ public class UserController {
         this.forgetPasswordService = forgetPasswordService;
     }
 
+    @GetMapping("/all-user")
+    public ResponseEntity<List<Users>> getAllUsers() {
+        List<Users> userList = userService.getAllUser();
+        return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
     @GetMapping("/allDoctors")
     public ResponseEntity<List<Users>> getAllDoctors() {
         List<Users> doctors = userService.getAllDoctors();
         return ResponseEntity.ok(doctors);
+    }
+
+    //http://localhost:8083/nepoHeal/user/getUserById/{id}
+    @GetMapping("/getUserById/{id}")
+    public ResponseEntity<Users> getUserById(@PathVariable long id) {
+        Users user = userService.getUser(id);
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/updateUserProfile/{id}")
+    public ResponseEntity<String> updateUserProfile(@PathVariable long id, @RequestBody UserDTO userDTO) {
+        String result =  userService.updateUserProfile(id, userDTO);
+        return ResponseEntity.ok(result);
+
     }
 
     @GetMapping("/getDoctorById/{id}")
@@ -50,8 +67,8 @@ public class UserController {
     }
 
     @GetMapping("/getpatientById/{patientId}")
-    public ResponseEntity<Patients> getPatientById(@PathVariable long patientId) {
-        Patients patient = userService.getPatientById(patientId);
+    public ResponseEntity<PatientDTO> getPatientById(@PathVariable long patientId) {
+        PatientDTO patient = userService.getPatientById(patientId);
         return new ResponseEntity<>(patient, HttpStatus.OK);
     }
 
