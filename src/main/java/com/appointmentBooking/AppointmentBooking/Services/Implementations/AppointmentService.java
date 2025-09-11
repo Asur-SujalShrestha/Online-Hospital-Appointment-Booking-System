@@ -70,25 +70,78 @@ public class AppointmentService implements IAppointmentService {
     }
 
     @Override
-    public List<Appointments> getAllAppointments() {
+    public List<GetAppointmentDTO> getAllAppointments() {
         List<Appointments> appointmentsList = appointmentRepository.findAll();
-        return appointmentsList.stream().map(appointment -> {
-            appointment.setPrescriptions(prescriptionClient.getPrescriptionByAppointment(appointment.getAppointmentId()));
-            return appointment;
-        }).collect(Collectors.toList());
+        return appointmentsList.stream()
+                .map(appointment -> {
+                    // Fetch patient info
+                    PatientDTO patient = doctorClient.getPatientById(appointment.getPatientId());
+                    UserDTO patientUser = doctorClient.getUserById(patient.getUser());
+                    String patientName =patientUser.getFirstName() + " " + patientUser.getLastName();
+
+                    // Fetch doctor info
+                    DoctorDTO doctor = doctorClient.getDoctor(appointment.getDoctorId());
+                    UserDTO doctorUser = doctorClient.getUserById(doctor.getUser());
+                    String doctorName = doctorUser.getFirstName() + " " + doctorUser.getLastName();
+
+                    //Fetch prescription list
+                    List<Prescriptions> prescriptions = prescriptionClient.getPrescriptionByAppointment(appointment.getAppointmentId());
+                    // Build DTO
+                    return GetAppointmentDTO.builder()
+                            .appointmentId(appointment.getAppointmentId())
+                            .doctorId(appointment.getDoctorId())
+                            .doctorName(doctorName)
+                            .patientId(appointment.getPatientId())
+                            .patientName(patientName)
+                            .appointmentDate(appointment.getAppointmentDate())
+                            .appointmentTime(appointment.getAppointmentTime())
+                            .bookedAt(appointment.getBookedAt())
+                            .notes(appointment.getNotes())
+                            .status(appointment.getStatus().toString())
+                            .prescriptions(prescriptions)
+                            .build();
+                })
+                .toList();
     }
 
     @Override
-    public List<Appointments> getAppointmentByDoctorId(Long doctorId) throws BadRequestException {
+    public List<GetAppointmentDTO> getAppointmentByDoctorId(Long doctorId) throws BadRequestException {
         DoctorDTO doctorDTO = doctorClient.getDoctor(doctorId);
         if(doctorDTO == null) {
             throw new BadRequestException("Doctor not found");
         }
-        List<Appointments> appointmentsList =  appointmentRepository.findByDoctorId(doctorId);
-        return appointmentsList.stream().map(appointments -> {
-            appointments.setPrescriptions(prescriptionClient.getPrescriptionByAppointment(appointments.getAppointmentId()));
-            return appointments;
-        }).collect(Collectors.toList());
+        List<Appointments> appointmentsList = appointmentRepository.findByDoctorId(doctorId);
+
+        return appointmentsList.stream()
+                .map(appointment -> {
+                    // Fetch patient info
+                    PatientDTO patient = doctorClient.getPatientById(appointment.getPatientId());
+                    UserDTO patientUser = doctorClient.getUserById(patient.getUser());
+                    String patientName =patientUser.getFirstName() + " " + patientUser.getLastName();
+
+                    // Fetch doctor info
+                    DoctorDTO doctor = doctorClient.getDoctor(appointment.getDoctorId());
+                    UserDTO doctorUser = doctorClient.getUserById(doctor.getUser());
+                    String doctorName = doctorUser.getFirstName() + " " + doctorUser.getLastName();
+
+                    //Fetch prescription list
+                    List<Prescriptions> prescriptions = prescriptionClient.getPrescriptionByAppointment(appointment.getAppointmentId());
+                    // Build DTO
+                    return GetAppointmentDTO.builder()
+                            .appointmentId(appointment.getAppointmentId())
+                            .doctorId(appointment.getDoctorId())
+                            .doctorName(doctorName)
+                            .patientId(appointment.getPatientId())
+                            .patientName(patientName)
+                            .appointmentDate(appointment.getAppointmentDate())
+                            .appointmentTime(appointment.getAppointmentTime())
+                            .bookedAt(appointment.getBookedAt())
+                            .notes(appointment.getNotes())
+                            .status(appointment.getStatus().toString())
+                            .prescriptions(prescriptions)
+                            .build();
+                })
+                .toList(); // Java 16+ (or use .collect(Collectors.toList()) for older version
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.appointmentBooking.AppointmentBooking.Controllers;
 
 import com.appointmentBooking.AppointmentBooking.DTOs.AddAppointmentDTO;
 import com.appointmentBooking.AppointmentBooking.DTOs.AddedAppointmentResponse;
+import com.appointmentBooking.AppointmentBooking.DTOs.GetAppointmentDTO;
 import com.appointmentBooking.AppointmentBooking.DTOs.UpdateAppointmentDTO;
 import com.appointmentBooking.AppointmentBooking.Entities.Appointments;
 import com.appointmentBooking.AppointmentBooking.Services.IAppointmentService;
@@ -23,6 +24,7 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
 
+    //http://localhost:8083/nepoHeal/appointment/book-appointment
     @PostMapping("/book-appointment")
     public ResponseEntity<AddedAppointmentResponse> addAppointment(@RequestBody AddAppointmentDTO appointmentDto) throws BadRequestException {
         AddedAppointmentResponse message = appointmentService.addAppointment(appointmentDto);
@@ -30,14 +32,14 @@ public class AppointmentController {
     }
 
     @GetMapping("/getAllAppointment")
-    public ResponseEntity<List<Appointments>> getAllAppointment() {
-        List<Appointments> appointmentsList = appointmentService.getAllAppointments();
+    public ResponseEntity<List<GetAppointmentDTO>> getAllAppointment() {
+        List<GetAppointmentDTO> appointmentsList = appointmentService.getAllAppointments();
         return ResponseEntity.ok(appointmentsList);
     }
 
     @GetMapping("/get-appointment-by-doctorId/{doctorId}")
-    public ResponseEntity<List<Appointments>> getAppointmentsByDoctorId(@PathVariable Long doctorId) throws BadRequestException {
-        List<Appointments> appointmentsList = appointmentService.getAppointmentByDoctorId(doctorId);
+    public ResponseEntity<List<GetAppointmentDTO>> getAppointmentsByDoctorId(@PathVariable Long doctorId) throws BadRequestException {
+        List<GetAppointmentDTO> appointmentsList = appointmentService.getAppointmentByDoctorId(doctorId);
         return ResponseEntity.ok(appointmentsList);
     }
 
@@ -65,7 +67,7 @@ public class AppointmentController {
         return ResponseEntity.ok(result);
     }
 
-    @PatchMapping("/updateAppointmentStatus/{appointmentId}")
+    @PutMapping("/updateAppointmentStatus/{appointmentId}")
     public ResponseEntity<String> updateAppointmentStatus(@PathVariable Long appointmentId, @RequestParam("status") String status) throws BadRequestException {
         String result = appointmentService.updateAppointmentStatus(appointmentId, status);
         return ResponseEntity.ok(result);

@@ -25,7 +25,7 @@ public class EmailService {
         String htmlContent = "<div style='font-family: Arial, sans-serif; padding: 20px;'>"
                 + "<h2 style='color: #2E86C1;'>Appointment Booking</h2>"
                 + "<p>Dear User,</p>"
-                + "<p>Your Appointment booking form has been <strong>submitted successfully</strong> for</p>" + "${appointment.getAppointmentDate()}" + "-" +appointment.getAppointmentTime()
+                + "<p>Your Appointment booking form has been <strong>submitted successfully</strong> for</p>" + appointment.getAppointmentDate() + " - " + appointment.getAppointmentTime()
                 + "<p>Please wait while our doctors reviews and approves your request. You will receive a notification once it's approved.</p>"
                 + "<p style='margin-top: 20px;'>Thank you for using out service with <strong>NepoHeal</strong>.</p>"
                 + "<p>Best regards,<br/>NepoHeal Team</p>"

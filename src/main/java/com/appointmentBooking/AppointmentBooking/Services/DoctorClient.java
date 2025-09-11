@@ -1,6 +1,7 @@
 package com.appointmentBooking.AppointmentBooking.Services;
 
 import com.appointmentBooking.AppointmentBooking.DTOs.DoctorDTO;
+import com.appointmentBooking.AppointmentBooking.DTOs.PatientDTO;
 import com.appointmentBooking.AppointmentBooking.DTOs.UserDTO;
 import jakarta.ws.rs.BadRequestException;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -22,4 +23,9 @@ public interface DoctorClient {
     @GetMapping("/nepoHeal/user/getUserByEmail/{email}")
     public UserDTO getUserByEmail(@PathVariable String email);
 
+    @GetMapping("/nepoHeal/user/getpatientById/{patientId}")
+    public PatientDTO getPatientById(@PathVariable long patientId);
+
+    @GetMapping("/nepoHeal/user/getUserById/{userId}")
+    public UserDTO getUserById(@PathVariable long userId);
 }
