@@ -1,5 +1,6 @@
 package com.user.UserService.Services.Implementations;
 
+import com.user.UserService.Config.HashPasswordEncoder;
 import com.user.UserService.DTOs.*;
 import com.user.UserService.Services.IUserService;
 import com.user.UserService.entities.DoctorSchedule;
@@ -12,6 +13,8 @@ import com.user.UserService.repositories.DoctorScheduleRepository;
 import com.user.UserService.repositories.PatientRepository;
 import jakarta.ws.rs.BadRequestException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +26,14 @@ public class UserService implements IUserService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final DoctorScheduleRepository doctorScheduleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserService(AuthRepository authRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, DoctorScheduleRepository doctorScheduleRepository) {
+    public UserService(AuthRepository authRepository, DoctorRepository doctorRepository, PatientRepository patientRepository, DoctorScheduleRepository doctorScheduleRepository, BCryptPasswordEncoder passwordEncoder) {
         this.authRepository = authRepository;
         this.doctorRepository = doctorRepository;
         this.patientRepository = patientRepository;
         this.doctorScheduleRepository = doctorScheduleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -178,5 +183,24 @@ public class UserService implements IUserService {
     @Override
     public List<Users> getAllUser() {
         return authRepository.findAll();
+    }
+
+    @Override
+    public String updatePassword(UpdatePasswordDTO updatePasswordDTO) {
+        Users user = authRepository.findById(updatePasswordDTO.getUserId()).orElseThrow(()-> new BadRequestException("User not found"));
+        if(!passwordEncoder.matches(updatePasswordDTO.getOldPassword(), user.getPassword())){
+            throw new BadRequestException("Old password does not match");
+        }
+        user.setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
+        authRepository.save(user);
+        return "Password updated successfully";
+    }
+
+    @Override
+    public String updateForgottenPassword(UpdatePasswordDTO updatePasswordDTO) {
+        Users user = authRepository.findById(updatePasswordDTO.getUserId()).orElseThrow(()-> new BadRequestException("User not found"));
+        user.setPassword(passwordEncoder.encode(updatePasswordDTO.getNewPassword()));
+        authRepository.save(user);
+        return "Password updated successfully";
     }
 }

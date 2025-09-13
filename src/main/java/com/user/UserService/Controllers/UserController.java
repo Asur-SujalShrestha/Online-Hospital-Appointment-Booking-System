@@ -120,6 +120,24 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/update-forgotten-password")
+    public ResponseEntity<String> updateForgottenPassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) throws BadRequestException {
+        if(!updatePasswordDTO.getNewPassword().equals(updatePasswordDTO.getConfirmPassword())){
+            throw new BadCredentialsException("New Password and Confirm Password should match");
+        }
+        String result = userService.updateForgottenPassword(updatePasswordDTO);
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/update-password")
+    public ResponseEntity<String> updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) throws BadRequestException {
+        if(!updatePasswordDTO.getNewPassword().equals(updatePasswordDTO.getConfirmPassword())){
+            throw new BadRequestException("New password and Confirm password should match");
+        }
+        String result = userService.updatePassword(updatePasswordDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

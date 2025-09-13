@@ -34,4 +34,8 @@ public interface IUserService {
     String updateUserProfile(long id, UserDTO userDTO);
 
     List<Users> getAllUser();
+
+    String updatePassword(UpdatePasswordDTO updatePasswordDTO);
+
+    String updateForgottenPassword(UpdatePasswordDTO updatePasswordDTO);
 }
