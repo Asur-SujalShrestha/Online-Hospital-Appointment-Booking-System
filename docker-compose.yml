@@ -1,0 +1,99 @@
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_DB: NepoHeal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sujal
+    ports:
+      - "5432:5432"
+    networks:
+      - nepoheal-net
+
+  config-server:
+    build: ./ConfigurationService
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nepoheal-net
+
+  service-registry:
+    build: ./ServiceRegistry
+    container_name: nepoheal-service-registry-1
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nepoheal-net
+
+  api-gateway:
+    build: ./ApiGateway
+    ports:
+      - "8083:8083"
+    depends_on:
+      - service-registry
+    networks:
+      - nepoheal-net
+
+  user-service:
+    build: ./UserService
+    ports:
+      - "8081:8081"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - nepoheal-net
+
+  appointment-service:
+    build: ./AppointmentBooking
+    ports:
+      - "8082:8082"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - nepoheal-net
+
+  prescription-service:
+    build: ./PrescriptionService
+    ports:
+      - "8084:8084"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks:
+      - nepoheal-net
+
+networks:
+  nepoheal-net:
+    driver: bridge
